@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chá de Fraldas · Maria Clara</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Nunito:wght@300;400;600;700&display=swap');
+:root{--rosa:#e8608a;--rosa-claro:#fce4ef;--roxo:#9b59b6;--roxo-claro:#efe0fb;--text:#4a2060;--sub:#9a6090}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:#1a0a2e}
+#app{width:100%;height:100%;position:relative;overflow:hidden}
+.page{position:absolute;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page.active{opacity:1;pointer-events:all}
+.page.ein-r{animation:sinR .7s cubic-bezier(.4,0,.2,1) forwards}
+.page.ein-l{animation:sinL .7s cubic-bezier(.4,0,.2,1) forwards}
+.page.eout-l{animation:soutL .7s cubic-bezier(.4,0,.2,1) forwards}
+.page.eout-r{animation:soutR .7s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes sinR{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes sinL{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes soutL{from{transform:translateX(0);opacity:1}to{transform:translateX(-100%);opacity:0}}
+@keyframes soutR{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+.page-1{background:linear-gradient(160deg,#1a0a2e 0%,#3d1060 40%,#6b1a7a 70%,#d4307a 100%)}
+.page-6{background:linear-gradient(160deg,#fff0f6 0%,#fde0ee 50%,#ffd6e8 100%)}
+.page-2{background:linear-gradient(160deg,#fff0f6 0%,#fde0ee 50%,#f5d0f8 100%)}
+.page-3{background:linear-gradient(160deg,#f8eeff 0%,#eddff8 50%,#fce4ef 100%)}
+.page-4{background:linear-gradient(160deg,#fff5f0 0%,#fdeae0 50%,#fce4ef 100%)}
+.page-5{background:linear-gradient(160deg,#f0fff5 0%,#e0f8ec 50%,#f0e8ff 100%)}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 24px 32px;pointer-events:none}
+.nbtn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;pointer-events:all;transition:transform .2s,opacity .3s;box-shadow:0 6px 20px rgba(0,0,0,.25);background:rgba(255,255,255,.9);color:var(--text);font-weight:700}
+.nbtn:hover{transform:scale(1.08)}
+.nbtn.hidden{opacity:0;pointer-events:none}
+.nbtn.nxt{background:linear-gradient(135deg,var(--rosa),var(--roxo));color:#fff;box-shadow:0 6px 22px rgba(180,80,160,.4)}
+.nbtn.dk{background:rgba(80,20,100,.12);color:var(--text);box-shadow:0 4px 14px rgba(100,50,120,.15)}
+.nbtn.dk.nxt{background:linear-gradient(135deg,var(--rosa),var(--roxo));color:#fff}
+.dots{display:flex;gap:8px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);border:1.5px solid rgba(255,255,255,.5);transition:all .3s}
+.dot.on{width:22px;border-radius:4px;background:#fff;border-color:#fff}
+.dots.dk .dot{background:rgba(100,50,120,.2);border-color:rgba(100,50,120,.3)}
+.dots.dk .dot.on{background:var(--roxo);border-color:var(--roxo)}
+
+/* PETALS */
+.pt{position:fixed;pointer-events:none;opacity:0;z-index:1;animation:ptfall linear infinite}
+@keyframes ptfall{0%{opacity:0;transform:translateY(-40px) rotate(0)}8%{opacity:.6}92%{opacity:.35}100%{opacity:0;transform:translateY(105vh) rotate(500deg)}}
+
+/* BURST */
+.brs{position:fixed;pointer-events:none;opacity:0;z-index:500;font-size:1.4rem}
+@keyframes bfly{0%{opacity:1;transform:translate(-50%,-50%) translate(0,0) scale(.3) rotate(0)}60%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) translate(var(--tx),var(--ty)) scale(1.2) rotate(var(--rot))}}
+
+/* ANIM IN */
+.ai{animation:fup .6s ease forwards;opacity:0}
+.ai:nth-child(1){animation-delay:.1s}.ai:nth-child(2){animation-delay:.18s}.ai:nth-child(3){animation-delay:.26s}.ai:nth-child(4){animation-delay:.34s}.ai:nth-child(5){animation-delay:.42s}.ai:nth-child(6){animation-delay:.5s}.ai:nth-child(7){animation-delay:.55s}.ai:nth-child(8){animation-delay:.6s}
+@keyframes fup{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%) translateY(30px);background:linear-gradient(135deg,var(--rosa),var(--roxo));color:#fff;padding:12px 26px;border-radius:30px;font-size:.84rem;font-weight:700;box-shadow:0 8px 28px rgba(180,80,160,.4);transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── PÁGINA 1 CAPA ── */
+.p1w{text-align:center;padding:40px 30px 100px;position:relative;z-index:2}
+.p1-bf{font-size:2.8rem;letter-spacing:12px;display:block;margin-bottom:18px;animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+.p1-invite{font-size:.68rem;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:12px;font-weight:300}
+.p1-cha{font-family:'Playfair Display',serif;font-size:clamp(.95rem,3.5vw,1.25rem);color:rgba(255,255,255,.8);letter-spacing:4px;text-transform:uppercase;margin-bottom:6px}
+.p1-name{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,14vw,6.5rem);color:#fff;font-style:italic;line-height:.95;text-shadow:0 0 60px rgba(255,180,220,.6),0 4px 20px rgba(0,0,0,.3)}
+.p1-clara{font-family:'Playfair Display',serif;font-size:clamp(2rem,8vw,3.8rem);color:rgba(255,255,255,.88);font-weight:400;margin-bottom:28px}
+.p1-div{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0}
+.p1-div::before,.p1-div::after{content:'';width:55px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4))}
+.p1-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);padding:12px 26px;border-radius:40px;color:#fff;font-size:.92rem;font-weight:600;letter-spacing:1px;margin-bottom:32px}
+.p1-tap{font-size:.7rem;color:rgba(255,255,255,.45);letter-spacing:2.5px;text-transform:uppercase;animation:pu 2s ease-in-out infinite}
+@keyframes pu{0%,100%{opacity:.45}50%{opacity:1}}
+.circ{position:absolute;border-radius:50%;pointer-events:none}
+
+/* ── INNER PAGES ── */
+.inner{width:100%;max-width:480px;padding:36px 22px 100px}
+.pg-lbl{font-size:.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--sub);text-align:center;margin-bottom:8px;font-weight:700;opacity:.7}
+.pg-icon{font-size:3.2rem;text-align:center;display:block;margin-bottom:12px;animation:ib 2s ease-in-out infinite}
+@keyframes ib{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.05)}}
+.pg-ttl{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,5.5vw,2.4rem);color:var(--text);text-align:center;line-height:1.15;margin-bottom:5px}
+.pg-ttl em{font-style:italic;color:var(--rosa)}
+.pg-sub{text-align:center;font-size:.83rem;color:var(--sub);margin-bottom:24px;font-style:italic}
+
+/* ── PÁGINA 2 LOCAL ── */
+.ic-row{display:flex;flex-direction:column;gap:12px}
+.ic-card{background:rgba(255,255,255,.75);border:1px solid rgba(220,160,220,.25);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 18px rgba(160,80,180,.07);transition:transform .2s}
+.ic-card:hover{transform:translateY(-2px)}
+.ic-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.ick-pink{background:linear-gradient(135deg,#fde0ec,#fbb6d0)}.ick-lilac{background:linear-gradient(135deg,#eeddf8,#d5b3ef)}.ick-peach{background:linear-gradient(135deg,#fdebd8,#f9c89a)}
+.ic-lbl{font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--sub);margin-bottom:3px}
+.ic-val{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text);font-weight:700}
+.ic-sub{font-size:.78rem;color:var(--sub);margin-top:1px}
+.mbtn{display:flex;align-items:center;justify-content:center;gap:9px;padding:13px;background:linear-gradient(135deg,var(--rosa),var(--roxo));color:#fff;text-decoration:none;border-radius:16px;font-size:.84rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 6px 22px rgba(180,80,160,.32);transition:transform .2s;margin-top:12px}
+.mbtn:hover{transform:translateY(-2px)}
+
+/* ── PÁGINA 3 FRALDAS ── */
+.fc{background:rgba(255,255,255,.78);border:1.5px solid rgba(220,160,220,.28);border-radius:22px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px rgba(160,80,180,.07)}
+.fct{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.fcl{display:flex;align-items:center;gap:12px}
+.fce{font-size:2.1rem}
+.fcn{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text);font-weight:700}
+.fcd{font-size:.7rem;color:var(--sub);margin-top:2px}
+.fcv{text-align:right}
+.fcvn{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);font-weight:700;line-height:1}
+.fcvl{font-size:.58rem;color:var(--sub);letter-spacing:1px;text-transform:uppercase}
+.pt-track{height:9px;border-radius:10px;background:rgba(220,180,220,.2);overflow:hidden;margin-bottom:8px}
+.pt-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#f7c5d8,var(--rosa));transition:width 1.2s cubic-bezier(.4,0,.2,1);width:0%}
+.pt-fill.quase{background:linear-gradient(90deg,#f9c89a,#e87a30)}
+.pt-fill.lotado{background:linear-gradient(90deg,#f8b8b8,#e85050)}
+.pt-st{display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--sub);margin-bottom:13px}
+.bdg{font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.bok{background:rgba(200,240,210,.8);color:#2a7a45}.bqs{background:rgba(255,220,190,.8);color:#b85a10}.bfull{background:rgba(255,200,200,.8);color:#b52020}
+.rbtn{width:100%;padding:11px;background:linear-gradient(135deg,#f7c5d8,var(--roxo-claro));color:var(--text);border:none;border-radius:13px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform .2s,box-shadow .2s;box-shadow:0 3px 12px rgba(180,80,160,.14)}
+.rbtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(180,80,160,.24)}
+.rbtn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ── PÁGINA 4 MIMOS ── */
+.mimo-intro{background:rgba(255,255,255,.7);border-radius:16px;padding:16px 18px;text-align:center;margin-bottom:16px;border:1px solid rgba(220,160,220,.2);font-size:.86rem;color:var(--sub);line-height:1.75;font-style:italic}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.mchip{background:rgba(255,255,255,.72);border:1px solid rgba(220,160,220,.25);border-radius:16px;padding:16px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.83rem;color:var(--text);font-weight:600;transition:transform .2s,box-shadow .2s;box-shadow:0 3px 10px rgba(160,80,180,.06)}
+.mchip:hover{transform:translateY(-3px);box-shadow:0 7px 20px rgba(160,80,180,.14)}
+.mchip .mi{font-size:1.75rem}
+.mchip.full{grid-column:span 2;flex-direction:row;justify-content:center;gap:10px}
+.mchip.full .mi{font-size:1.5rem}
+
+/* ── PÁGINA 5 PIX ── */
+.px-card{background:rgba(255,255,255,.8);border:2px dashed var(--roxo-claro);border-radius:24px;padding:28px 22px 22px;margin-bottom:16px;text-align:center}
+.px-top{font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--sub);margin-bottom:14px}
+.px-kw{background:var(--roxo-claro);border-radius:14px;padding:12px 20px;display:inline-block;margin-bottom:6px}
+.px-key{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--text);letter-spacing:2px}
+.px-name{font-size:.8rem;color:var(--sub);margin-bottom:18px}
+.cpbtn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 28px;background:linear-gradient(135deg,var(--rosa),var(--roxo));color:#fff;border:none;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 6px 22px rgba(180,80,160,.35);transition:transform .2s;width:100%}
+.cpbtn:hover{transform:translateY(-2px)}
+.cpbtn.ok{background:linear-gradient(135deg,#5dba78,#3a9a58)}
+.px-note{background:rgba(255,255,255,.65);border-radius:14px;padding:14px 16px;font-size:.82rem;color:var(--sub);line-height:1.75;font-style:italic;border:1px solid rgba(220,160,220,.2)}
+
+/* ── PÁGINA 6 FINAL (rosa bebê) ── */
+.p6w{text-align:center;padding:40px 28px 100px;position:relative;z-index:2}
+.p6fl{font-size:2rem;letter-spacing:10px;display:block;margin-bottom:20px;animation:fl 3s ease-in-out infinite}
+.p6t{font-family:'Playfair Display',serif;font-size:clamp(1rem,3.5vw,1.2rem);color:var(--sub);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.p6n{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,11vw,5rem);color:var(--rosa);font-style:italic;text-shadow:0 0 40px rgba(232,96,138,.3);margin-bottom:20px;line-height:1.05}
+.p6m{color:var(--sub);font-size:.9rem;line-height:2.1;margin-bottom:26px;max-width:320px;margin-left:auto;margin-right:auto}
+.p6m strong{color:var(--text);font-family:'Playfair Display',serif}
+.p6date{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.75);border:1px solid rgba(220,160,200,.3);backdrop-filter:blur(10px);padding:11px 24px;border-radius:40px;color:var(--text);font-size:.85rem;font-weight:600;letter-spacing:.5px;box-shadow:0 4px 16px rgba(180,80,160,.1)}
+
+/* ── PÁGINA 7 CONFIRMAÇÃO ── */
+.page-7{background:linear-gradient(160deg,#f8eeff 0%,#fde0ee 50%,#fff0f6 100%)}
+.rsvp-card{background:rgba(255,255,255,.82);border:1.5px solid rgba(220,160,220,.3);border-radius:24px;padding:24px 22px;margin-bottom:14px;text-align:center;box-shadow:0 4px 18px rgba(160,80,180,.08)}
+.rsvp-intro{font-size:.86rem;color:var(--sub);line-height:1.75;margin-bottom:18px;font-style:italic}
+.rsvp-input-wrap{margin-bottom:14px;text-align:left}
+.rsvp-label{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--sub);margin-bottom:6px;display:block;font-weight:700}
+.rsvp-input{width:100%;padding:12px 16px;border:1.5px solid rgba(220,160,220,.4);border-radius:12px;font-size:.92rem;font-family:'Nunito',sans-serif;color:var(--text);background:rgba(255,255,255,.9);outline:none;transition:border-color .2s}
+.rsvp-input:focus{border-color:var(--rosa)}
+.rsvp-select{width:100%;padding:12px 16px;border:1.5px solid rgba(220,160,220,.4);border-radius:12px;font-size:.92rem;font-family:'Nunito',sans-serif;color:var(--text);background:rgba(255,255,255,.9);outline:none;appearance:none;cursor:pointer}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:16px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 6px 22px rgba(37,211,102,.35);transition:transform .2s,box-shadow .2s;width:100%;text-decoration:none}
+.wa-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.45)}
+.wa-note{font-size:.75rem;color:var(--sub);margin-top:10px;font-style:italic;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- PÁGINA 1 — CAPA -->
+<div class="page page-1 active" id="pg0">
+  <div class="circ" style="width:280px;height:280px;background:radial-gradient(circle,rgba(255,180,220,.15),transparent 70%);top:-70px;left:-70px"></div>
+  <div class="circ" style="width:220px;height:220px;background:radial-gradient(circle,rgba(180,100,255,.18),transparent 70%);bottom:80px;right:-50px"></div>
+  <div class="p1w">
+    <span class="p1-bf">🦋 🌸 🦋</span>
+    <div class="p1-invite">você está convidado(a) para o</div>
+    <div class="p1-cha">Chá de Fraldas</div>
+    <div class="p1-name">Maria</div>
+    <div class="p1-clara">Clara</div>
+    <div class="p1-div"><span style="font-size:1.1rem;opacity:.8">🌷</span></div>
+    <div class="p1-badge">📅 21 de Março &nbsp;·&nbsp; 🕒 17h00</div>
+    <div class="p1-tap">✦ deslize para ver o convite ✦</div>
+  </div>
+</div>
+
+<!-- PÁGINA 2 — DATA & LOCAL -->
+<div class="page page-2" id="pg1">
+  <div class="inner">
+    <div class="pg-lbl ai">onde &amp; quando</div>
+    <span class="pg-icon ai">🗓️</span>
+    <div class="pg-ttl ai">Data &amp; <em>Local</em></div>
+    <div class="pg-sub ai">Todos os detalhes para você chegar</div>
+    <div class="ic-row">
+      <div class="ic-card ai">
+        <div class="ic-ico ick-pink">📅</div>
+        <div><div class="ic-lbl">Data</div><div class="ic-val">21 de Março de 2025</div></div>
+      </div>
+      <div class="ic-card ai">
+        <div class="ic-ico ick-lilac">🕒</div>
+        <div><div class="ic-lbl">Horário</div><div class="ic-val">17h00</div><div class="ic-sub">Pontualidade é um mimo 😊</div></div>
+      </div>
+      <div class="ic-card ai">
+        <div class="ic-ico ick-peach">📍</div>
+        <div><div class="ic-lbl">Local</div><div class="ic-val">Paradiso Garden</div><div class="ic-sub">Rua das Seringueiras, 22</div></div>
+      </div>
+      <a class="mbtn ai" href="https://share.google/iyDSfHaQi0483lP1J" target="_blank">🗺️ Abrir no Google Maps</a>
+    </div>
+  </div>
+</div>
+
+<!-- PÁGINA 3 — FRALDAS -->
+<div class="page page-3" id="pg2">
+  <div class="inner">
+    <div class="pg-lbl ai">lista de presentes</div>
+    <span class="pg-icon ai">🍼</span>
+    <div class="pg-ttl ai"><em>Fraldas</em> com Amor</div>
+    <div class="pg-sub ai">Reserve sua vaga · vagas limitadas</div>
+    <div class="fc ai">
+      <div class="fct">
+        <div class="fcl"><div class="fce">🛍️</div><div><div class="fcn">Fralda Tamanho M</div><div class="fcd">Ideal para 4–8 kg</div></div></div>
+        <div class="fcv"><div class="fcvn" id="vagasM">30</div><div class="fcvl">vagas</div></div>
+      </div>
+      <div class="pt-track"><div class="pt-fill" id="barM"></div></div>
+      <div class="pt-st"><span class="bdg bok" id="tagM">✓ Disponível</span><span id="txtM">0 de 30 reservadas</span></div>
+      <button class="rbtn" id="btnM" onclick="reservar('M')">🍼 Quero trazer Fralda M</button>
+    </div>
+    <div class="fc ai">
+      <div class="fct">
+        <div class="fcl"><div class="fce">🛍️</div><div><div class="fcn">Fralda Tamanho G</div><div class="fcd">Ideal para 8–12 kg</div></div></div>
+        <div class="fcv"><div class="fcvn" id="vagasG">30</div><div class="fcvl">vagas</div></div>
+      </div>
+      <div class="pt-track"><div class="pt-fill" id="barG"></div></div>
+      <div class="pt-st"><span class="bdg bok" id="tagG">✓ Disponível</span><span id="txtG">0 de 30 reservadas</span></div>
+      <button class="rbtn" id="btnG" onclick="reservar('G')">🍼 Quero trazer Fralda G</button>
+    </div>
+  </div>
+</div>
+
+<!-- PÁGINA 4 — MIMOS -->
+<div class="page page-4" id="pg3">
+  <div class="inner">
+    <div class="pg-lbl ai">outros presentes</div>
+    <span class="pg-icon ai">🎀</span>
+    <div class="pg-ttl ai">Sugestões de <em>Mimos</em></div>
+    <div class="pg-sub ai">Qualquer presente vindo de você será especial</div>
+    <div class="mimo-intro ai">Não há regras! Traga o <strong style="color:var(--rosa);font-family:'Playfair Display',serif">presente que o seu coração mandar</strong> 💜<br>Aqui vão algumas sugestões com amor…</div>
+    <div class="mgrid">
+      <div class="mchip ai"><div class="mi">🧴</div>Higiene bebê</div>
+      <div class="mchip ai"><div class="mi">👗</div>Roupinhas</div>
+      <div class="mchip ai"><div class="mi">🧸</div>Brinquedos</div>
+      <div class="mchip ai"><div class="mi">🛁</div>Kit banho</div>
+      <div class="mchip ai"><div class="mi">🍼</div>Mamadeiras</div>
+      <div class="mchip ai"><div class="mi">🎁</div>Enxoval</div>
+      <div class="mchip full ai"><div class="mi">🎀</div>O mimo que seu coração mandar!</div>
+    </div>
+  </div>
+</div>
+
+<!-- PÁGINA 5 — PIX -->
+<div class="page page-5" id="pg4">
+  <div class="inner">
+    <div class="pg-lbl ai">sem tempo? sem problema!</div>
+    <span class="pg-icon ai">💜</span>
+    <div class="pg-ttl ai">Contribuição <em>via Pix</em></div>
+    <div class="pg-sub ai">Rápido, fácil e cheio de amor</div>
+    <div class="px-card ai">
+      <div class="px-top">💜 chave pix</div>
+      <div class="px-kw"><div class="px-key" id="pixKey">05896316321</div></div>
+      <div class="px-name">João Pedro Muniz</div>
+      <button class="cpbtn" id="copyBtn" onclick="copyPix()">📋 Copiar chave Pix</button>
+    </div>
+    <div class="px-note ai">Se não conseguir comprar um presente a tempo, o Pix é uma forma linda e prática de contribuir para a chegada de <strong style="color:var(--rosa);font-family:'Playfair Display',serif">Maria Clara</strong> 🌸 Será recebido com muito carinho!</div>
+  </div>
+</div>
+
+<!-- PÁGINA 6 — ENCERRAMENTO (rosa bebê) -->
+<div class="page page-6" id="pg5">
+  <div class="circ" style="width:280px;height:280px;background:radial-gradient(circle,rgba(255,180,220,.3),transparent 70%);top:-70px;right:-70px;pointer-events:none"></div>
+  <div class="circ" style="width:200px;height:200px;background:radial-gradient(circle,rgba(200,140,230,.2),transparent 70%);bottom:80px;left:-40px;pointer-events:none"></div>
+  <div class="p6w">
+    <span class="p6fl">🌸 🦋 🌷</span>
+    <div class="p6t">celebre conosco a chegada de</div>
+    <div class="p6n">Maria Clara</div>
+    <div class="p6m">Estamos <strong>ansiosas</strong> para celebrar este momento tão especial com pessoas que amamos tanto. 🌷<br><br>Sua presença é o presente mais bonito que poderíamos receber. ✨<br><br><em style="color:var(--sub)">Com amor e gratidão, a família</em></div>
+    <div class="p6date">📅 21 de Março &nbsp;·&nbsp; 🕒 17h00 &nbsp;·&nbsp; 📍 Paradiso Garden</div>
+  </div>
+</div>
+
+<!-- PÁGINA 7 — CONFIRMAÇÃO DE PRESENÇA -->
+<div class="page page-7" id="pg6">
+  <div class="inner">
+    <div class="pg-lbl ai">confirme sua presença</div>
+    <span class="pg-icon ai">💌</span>
+    <div class="pg-ttl ai">Confirmar <em>Presença</em></div>
+    <div class="pg-sub ai">Nos diga que você vem! 🌸</div>
+    <div class="rsvp-card ai">
+      <p class="rsvp-intro">Preencha seus dados e envie a confirmação direto pelo WhatsApp. Mal podemos esperar para te ver por lá! 🦋</p>
+      <div class="rsvp-input-wrap">
+        <label class="rsvp-label">👤 Seu nome</label>
+        <input class="rsvp-input" id="rsvpNome" type="text" placeholder="Como podemos te chamar?" />
+      </div>
+      <div class="rsvp-input-wrap">
+        <label class="rsvp-label">👥 Número de pessoas</label>
+        <select class="rsvp-select" id="rsvpQtd">
+          <option value="1">Só eu 🌸</option>
+          <option value="2">Eu + 1 pessoa</option>
+          <option value="3">Eu + 2 pessoas</option>
+          <option value="4">Eu + 3 pessoas</option>
+        </select>
+      </div>
+      <button class="wa-btn" onclick="confirmarPresenca()">
+        <span style="font-size:1.3rem">💬</span> Confirmar pelo WhatsApp
+      </button>
+      <p class="wa-note">Você será redirecionado(a) para o WhatsApp com a mensagem já preenchida ✨</p>
+    </div>
+  </div>
+</div>
+
+<!-- NAVEGAÇÃO -->
+<div class="nav" id="nav">
+  <button class="nbtn hidden" id="bPrev" onclick="prev()">‹</button>
+  <div class="dots" id="dotWrap">
+    <div class="dot on"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+  <button class="nbtn nxt" id="bNext" onclick="next()">›</button>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const N=7,darkPgs=new Set([0]);
+let cur=0,animating=false;
+const fraldas={M:{total:30,res:0},G:{total:30,res:0}};
+
+function goTo(t,dir){
+  if(animating||t<0||t>=N)return;
+  animating=true;
+  burst();
+  const cp=document.getElementById('pg'+cur);
+  const np=document.getElementById('pg'+t);
+  cp.classList.add(dir>0?'eout-l':'eout-r');
+  np.style.opacity='1';np.style.pointerEvents='all';
+  np.classList.add(dir>0?'ein-r':'ein-l');
+  np.querySelectorAll('.ai').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation='';});
+  setTimeout(()=>{
+    cp.classList.remove('active','eout-l','eout-r');cp.style.opacity='';cp.style.pointerEvents='';
+    np.classList.remove('ein-r','ein-l');np.classList.add('active');
+    np.scrollTop=0;cur=t;updateNav();animating=false;
+  },700);
+}
+function next(){goTo(cur+1,1);}
+function prev(){goTo(cur-1,-1);}
+
+function updateNav(){
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
+  document.getElementById('bPrev').classList.toggle('hidden',cur===0);
+  document.getElementById('bNext').classList.toggle('hidden',cur===N-1);
+  const light=!darkPgs.has(cur);
+  document.getElementById('dotWrap').classList.toggle('dk',light);
+  ['bPrev','bNext'].forEach(id=>document.getElementById(id).classList.toggle('dk',light));
+}
+
+// Touch swipe
+let tx0=0,ty0=0;
+document.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx0,dy=e.changedTouches[0].clientY-ty0;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>45){dx<0?next():prev();}
+},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();});
+
+// Pétalas de fundo
+const pe=['🌸','🌷','🦋','💜','🌺','✿'];
+function mkPetal(){
+  const el=document.createElement('span');el.className='pt';
+  el.textContent=pe[Math.floor(Math.random()*pe.length)];
+  el.style.left=Math.random()*100+'vw';
+  const d=8+Math.random()*9;
+  el.style.animationDuration=d+'s';
+  el.style.animationDelay=Math.random()*3+'s';
+  el.style.fontSize=(.6+Math.random()*.9)+'rem';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),(d+4)*1000);
+}
+setInterval(mkPetal,1400);for(let i=0;i<6;i++)setTimeout(mkPetal,i*250);
+
+// Burst borboletas
+const be=['🦋','🌸','🌷','💜','🌺'];
+function burst(){
+  const cx=window.innerWidth/2,cy=window.innerHeight/2;
+  for(let i=0;i<10;i++){
+    const b=document.createElement('span');b.className='brs';
+    b.textContent=be[i%be.length];b.style.left=cx+'px';b.style.top=cy+'px';
+    const a=(36)*i+Math.random()*20,d=80+Math.random()*120,r=a*(Math.PI/180);
+    b.style.setProperty('--tx',Math.cos(r)*d+'px');
+    b.style.setProperty('--ty',Math.sin(r)*d+'px');
+    b.style.setProperty('--rot',(-200+Math.random()*400)+'deg');
+    const dur=.5+Math.random()*.35;
+    b.style.animation=`bfly ${dur}s ${i*.04}s ease-out forwards`;
+    document.body.appendChild(b);setTimeout(()=>b.remove(),(dur+.5)*1000);
+  }
+}
+
+// Fraldas
+function reservar(t){
+  const f=fraldas[t];if(f.res>=f.total)return;
+  f.res++;updFralda(t);showToast('🍼 Obrigada! Fralda '+t+' reservada com amor 💜');
+}
+function updFralda(t){
+  const f=fraldas[t],r=f.total-f.res,p=(f.res/f.total)*100;
+  document.getElementById('vagas'+t).textContent=r;
+  document.getElementById('txt'+t).textContent=f.res+' de '+f.total+' reservadas';
+  const bar=document.getElementById('bar'+t),tag=document.getElementById('tag'+t),btn=document.getElementById('btn'+t);
+  bar.style.width=p+'%';bar.className='pt-fill';
+  if(r===0){bar.classList.add('lotado');tag.className='bdg bfull';tag.textContent='✗ Esgotado';btn.disabled=true;btn.textContent='😔 Vagas esgotadas';}
+  else if(p>=70){bar.classList.add('quase');tag.className='bdg bqs';tag.textContent='⚡ Quase lotado';}
+  else{tag.className='bdg bok';tag.textContent='✓ Disponível';}
+}
+
+// Pix
+function copyPix(){
+  const key=document.getElementById('pixKey').textContent.trim();
+  const btn=document.getElementById('copyBtn');
+  const done=()=>{btn.textContent='✅ Copiado!';btn.classList.add('ok');showToast('💜 Chave Pix copiada!');setTimeout(()=>{btn.textContent='📋 Copiar chave Pix';btn.classList.remove('ok');},2500);};
+  if(navigator.clipboard)navigator.clipboard.writeText(key).then(done).catch(()=>fb(key,done));else fb(key,done);
+}
+function fb(t,cb){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);cb();}
+
+// Confirmação WhatsApp
+function confirmarPresenca(){
+  const nome=document.getElementById('rsvpNome').value.trim();
+  const qtd=document.getElementById('rsvpQtd').value;
+  const qtdTexto=['','Só eu 🌸','Eu + 1 pessoa','Eu + 2 pessoas','Eu + 3 pessoas'][qtd];
+  if(!nome){showToast('✏️ Por favor, escreva seu nome!');return;}
+  const msg=`🌸 *Confirmação de Presença* 🌸\n\nOlá! Eu sou *${nome}* e quero confirmar minha presença no Chá de Fraldas da Maria Clara! 🦋\n\n👥 Vou comparecer: ${qtdTexto}\n📅 Data: 21 de Março\n🕒 Horário: 17h00\n📍 Paradiso Garden\n\nMal posso esperar! 💜`;
+  const url='https://wa.me/5598984232543?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+  showToast('💬 Abrindo WhatsApp… 🌸');
+}
+
+// Toast
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+updateNav();
+</script>
+</body>
+</html>
