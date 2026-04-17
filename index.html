@@ -384,7 +384,7 @@ function confirmarPresenca(){
   const qtd=document.getElementById('rsvpQtd').value;
   const qtdTexto=['','Só eu 🌸','Eu + 1 pessoa','Eu + 2 pessoas','Eu + 3 pessoas'][qtd];
   if(!nome){showToast('✏️ Por favor, escreva seu nome!');return;}
-  const msg=`🌸 *Confirmação de Presença* 🌸\n\nOlá! Eu sou *${nome}* e quero confirmar minha presença no Chá de Fraldas da Maria Clara! 🦋\n\n👥 Vou comparecer: ${qtdTexto}\n📅 Data: 9 de Maio\n🕒 Horário: 16h00\n📍 Condomínio Brisas · Alto do Calhau · Torre Noite · Ap 1006\n\nMal posso esperar! 💜`;
+  const msg=`🌸 *Confirmação de Presença* 🌸\n\nOlá! Eu sou *${nome}* e quero confirmar minha presença no Chá de Fraldas da Maria Clara! 🦋\n\n👥 Vou comparecer: ${qtdTexto}\n📅 Data: 9 de Maio\n🕒 Horário: 16h00\n📍 Condomínio Brisas · Alto do Calhau · Torre Noite · Ap 1006\n\nAguardo sua presença com carinho! 💜`;
   const url='https://wa.me/5598984232543?text='+encodeURIComponent(msg);
   window.open(url,'_blank');
   showToast('💬 Abrindo WhatsApp… 🌸');
